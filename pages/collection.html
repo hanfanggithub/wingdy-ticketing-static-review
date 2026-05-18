@@ -15,7 +15,7 @@
       <a href="../index.html" class="site-logo">Wingdy</a>
       <p class="site-tagline">Curated tickets for Nordic-grade escapes</p>
     </div>
-    <nav class="site-nav"><ul class="site-nav__menu"><li><a href="../index.html">Home</a></li><li><a href="../pages/collection.html" data-copy="collections">Collections</a></li><li><a href="../pages/policy.html" data-copy="policy">Policy</a></li></ul></nav>
+    <nav class="site-nav"><ul class="site-nav__menu"><li><a href="../index.html">Home</a></li><li><a href="../pages/collection.html" data-copy="collections">Collections</a></li><li><a href="../pages/cart.html" data-copy="cart">Cart</a></li><li><a href="../pages/policy.html" data-copy="policy">Policy</a></li></ul></nav>
     <div class="site-switchers">
       <button type="button" data-locale-toggle="en">EN</button>
       <button type="button" data-locale-toggle="zh">中文</button>
@@ -29,11 +29,16 @@
       <p class="eyebrow" data-copy="collections">Collection</p>
       <h1 data-copy="collection_title">All showcase products</h1>
       <p class="muted" data-copy="collection_body">This page is fully static but structured like a real product collection for public review.</p>
-      <div class="filter-row">
-        <span class="filter-chip" data-copy="tickets">Tickets</span>
-        <span class="filter-chip" data-copy="packages">Packages</span>
-        <span class="filter-chip">Family</span>
-        <span class="filter-chip">Premium</span>
+      <div class="search-panel" style="margin-bottom:18px;">
+        <label for="catalog-search" data-copy="search_label">Search experiences</label>
+        <input id="catalog-search" data-catalog-search type="search" placeholder="Blue Lagoon, Golden Circle, glacier caves">
+        <input type="hidden" data-active-tag value="all">
+        <div class="filter-row">
+          <button type="button" class="filter-chip" data-filter-tag="all">All</button>
+          <button type="button" class="filter-chip" data-filter-tag="Hot">Hot</button>
+          <button type="button" class="filter-chip" data-filter-tag="Family">Family</button>
+          <button type="button" class="filter-chip" data-filter-tag="Premium">Premium</button>
+        </div>
       </div>
       <div class="product-grid" data-all-products></div>
     </section>

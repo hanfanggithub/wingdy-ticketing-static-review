@@ -1,4 +1,10 @@
 import { siteData } from "./site-data.js";
+import {
+  createCartState,
+  createLocalOrder,
+  filterCatalog,
+  validateCheckout,
+} from "./modules/local-commerce.js";
 
 const state = {
   locale: localStorage.getItem("wingdy_locale") || "zh",
@@ -22,6 +28,24 @@ function translate(key) {
   return siteData.dictionary[state.locale]?.[key] || siteData.dictionary.en[key] || key;
 }
 
+function getCatalog() {
+  return [...siteData.tickets, ...siteData.packages];
+}
+
+function loadCart() {
+  try {
+    return JSON.parse(localStorage.getItem("wingdy_cart") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+const cart = createCartState(loadCart());
+
+function persistCart() {
+  localStorage.setItem("wingdy_cart", JSON.stringify(cart.items()));
+}
+
 function setState(next) {
   Object.assign(state, next);
   localStorage.setItem("wingdy_locale", state.locale);
@@ -30,12 +54,14 @@ function setState(next) {
   renderCatalogs();
   renderPolicies();
   renderDetail();
+  renderCartPage();
+  renderCheckoutPage();
 }
 
-function createCard(item) {
+function createCard(item, hrefBase = "./pages") {
   const href = item.type === "ticket"
-    ? `./pages/ticket-${item.id}.html`
-    : `./pages/package-${item.id}.html`;
+    ? `${hrefBase}/ticket-${item.id}.html`
+    : `${hrefBase}/package-${item.id}.html`;
 
   return `
     <article class="product-card">
@@ -52,7 +78,7 @@ function createCard(item) {
         </div>
         <div class="product-card__actions">
           <a class="button button--primary" href="${href}">${translate("view_ticket")}</a>
-          <a class="button button--secondary" href="./pages/policy.html#checkout">${translate("checkout")}</a>
+          <button class="button button--secondary" type="button" data-add-to-cart="${item.id}">${translate("add_to_cart")}</button>
         </div>
       </div>
     </article>
@@ -63,17 +89,25 @@ function renderCatalogs() {
   const featured = document.querySelector("[data-featured-grid]");
   const packages = document.querySelector("[data-package-grid]");
   const allProducts = document.querySelector("[data-all-products]");
+  const searchInput = document.querySelector("[data-catalog-search]");
+  const activeTag = document.querySelector("[data-active-tag]")?.value || "all";
+  const query = searchInput?.value || "";
+
+  const featuredItems = filterCatalog(siteData.tickets, { query, tag: activeTag });
+  const packageItems = filterCatalog(siteData.packages, { query, tag: activeTag });
+  const allItems = filterCatalog(getCatalog(), { query, tag: activeTag });
 
   if (featured) {
-    featured.innerHTML = siteData.tickets.map(createCard).join("");
+    featured.innerHTML = featuredItems.map((item) => createCard(item, "./pages")).join("");
   }
   if (packages) {
-    packages.innerHTML = siteData.packages.map(createCard).join("");
+    packages.innerHTML = packageItems.map((item) => createCard(item, "./pages")).join("");
   }
   if (allProducts) {
-    const merged = [...siteData.tickets, ...siteData.packages];
-    allProducts.innerHTML = merged.map(createCard).join("");
+    allProducts.innerHTML = allItems.map((item) => createCard(item, ".")).join("");
   }
+
+  bindAddToCartButtons();
 }
 
 function renderPolicies() {
@@ -98,17 +132,6 @@ function renderGlobalCopy() {
     }
   });
 
-  const placeholders = [
-    ["[data-placeholder='search_label']", "search_label"],
-    ["[data-placeholder='faq']", "support_title"],
-  ];
-
-  placeholders.forEach(([selector, key]) => {
-    document.querySelectorAll(selector).forEach((node) => {
-      node.setAttribute("placeholder", translate(key));
-    });
-  });
-
   const cookieCopy = document.querySelector("[data-cookie-copy]");
   if (cookieCopy) cookieCopy.textContent = translate("consent_title");
   const cookieAccept = document.querySelector("[data-cookie-accept]");
@@ -123,6 +146,43 @@ function bindSwitchers() {
   });
   document.querySelectorAll("[data-currency-toggle]").forEach((button) => {
     button.addEventListener("click", () => setState({ currency: button.dataset.currencyToggle || "USD" }));
+  });
+}
+
+function bindCatalogSearch() {
+  const search = document.querySelector("[data-catalog-search]");
+  search?.addEventListener("input", () => renderCatalogs());
+}
+
+function bindTagFilters() {
+  document.querySelectorAll("[data-filter-tag]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const hidden = document.querySelector("[data-active-tag]");
+      if (hidden) {
+        hidden.value = button.dataset.filterTag || "all";
+      }
+      renderCatalogs();
+    });
+  });
+}
+
+function bindAddToCartButtons() {
+  document.querySelectorAll("[data-add-to-cart]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.getAttribute("data-add-to-cart");
+      const item = getCatalog().find((entry) => entry.id === id);
+      if (!item) {
+        return;
+      }
+      cart.addItem({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        quantity: 1,
+      });
+      persistCart();
+      renderCartPage();
+    });
   });
 }
 
@@ -175,7 +235,7 @@ function renderDetail() {
   const detail = document.querySelector("[data-detail-id]");
   if (!detail) return;
   const id = detail.dataset.detailId;
-  const item = [...siteData.tickets, ...siteData.packages].find((entry) => entry.id === id);
+  const item = getCatalog().find((entry) => entry.id === id);
   if (!item) return;
 
   const title = detail.querySelector("[data-detail-title]");
@@ -184,6 +244,7 @@ function renderDetail() {
   const price = detail.querySelector("[data-detail-price]");
   const tags = detail.querySelector("[data-detail-tags]");
   const region = detail.querySelector("[data-detail-region]");
+  const addToCart = detail.querySelector("[data-detail-add-to-cart]");
 
   if (title) title.textContent = item.title;
   if (image) {
@@ -194,6 +255,147 @@ function renderDetail() {
   if (price) price.textContent = formatCurrency(item.price, state.currency);
   if (tags) tags.innerHTML = item.tags.map((tag) => `<span>${tag}</span>`).join("");
   if (region) region.textContent = item.region;
+  if (addToCart) {
+    addToCart.setAttribute("data-add-to-cart", item.id);
+    addToCart.textContent = translate("add_to_cart");
+  }
+
+  bindAddToCartButtons();
+}
+
+function renderCartPage() {
+  const cartItemsHost = document.querySelector("[data-cart-items]");
+  const emptyState = document.querySelector("[data-cart-empty]");
+  const contentState = document.querySelector("[data-cart-content]");
+  if (!cartItemsHost || !emptyState || !contentState) {
+    return;
+  }
+
+  const items = cart.items();
+  if (!items.length) {
+    emptyState.hidden = false;
+    contentState.hidden = true;
+    return;
+  }
+
+  emptyState.hidden = true;
+  contentState.hidden = false;
+
+  cartItemsHost.innerHTML = items.map((item) => `
+    <article class="product-card">
+      <div class="product-card__body">
+        <h3>${item.title}</h3>
+        <p>${formatCurrency(item.price, state.currency)} x ${item.quantity}</p>
+        <div class="product-card__actions">
+          <button class="button button--secondary" type="button" data-cart-decrease="${item.id}">-</button>
+          <button class="button button--secondary" type="button" data-cart-increase="${item.id}">+</button>
+          <button class="button button--secondary" type="button" data-cart-remove="${item.id}">Remove</button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  const totals = cart.totals(siteData.feeRate);
+  document.querySelector("[data-cart-subtotal]").textContent = formatCurrency(totals.subtotal, state.currency);
+  document.querySelector("[data-cart-fee]").textContent = formatCurrency(totals.fee, state.currency);
+  document.querySelector("[data-cart-total]").textContent = formatCurrency(totals.total, state.currency);
+
+  document.querySelectorAll("[data-cart-increase]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.getAttribute("data-cart-increase");
+      const entry = cart.items().find((item) => item.id === id);
+      if (!entry) return;
+      cart.updateQuantity(id, entry.quantity + 1);
+      persistCart();
+      renderCartPage();
+    });
+  });
+
+  document.querySelectorAll("[data-cart-decrease]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.getAttribute("data-cart-decrease");
+      const entry = cart.items().find((item) => item.id === id);
+      if (!entry) return;
+      cart.updateQuantity(id, entry.quantity - 1);
+      persistCart();
+      renderCartPage();
+    });
+  });
+
+  document.querySelectorAll("[data-cart-remove]").forEach((button) => {
+    button.addEventListener("click", () => {
+      cart.removeItem(button.getAttribute("data-cart-remove"));
+      persistCart();
+      renderCartPage();
+    });
+  });
+}
+
+function renderCheckoutPage() {
+  const summaryHost = document.querySelector("[data-checkout-summary]");
+  if (!summaryHost) {
+    return;
+  }
+
+  const totals = cart.totals(siteData.feeRate);
+  summaryHost.innerHTML = `
+    <p>${translate("subtotal_label")}: ${formatCurrency(totals.subtotal, state.currency)}</p>
+    <p>${translate("service_fee_label")}: ${formatCurrency(totals.fee, state.currency)}</p>
+    <p><strong>${translate("total_label")}: ${formatCurrency(totals.total, state.currency)}</strong></p>
+  `;
+}
+
+function bindCheckoutForm() {
+  const form = document.querySelector("[data-checkout-form]");
+  if (!form) {
+    return;
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const payload = {
+      email: String(formData.get("email") || ""),
+      phone: String(formData.get("phone") || ""),
+      nationality: String(formData.get("nationality") || ""),
+    };
+
+    const validation = validateCheckout(payload);
+    ["email", "phone", "nationality"].forEach((field) => {
+      const target = document.querySelector(`[data-error-${field}]`);
+      if (!target) return;
+      const message = validation.errors[field] || "";
+      target.hidden = !message;
+      target.textContent = message;
+    });
+
+    if (!validation.valid) {
+      return;
+    }
+
+    const order = createLocalOrder({
+      customer: payload,
+      cartItems: cart.items(),
+      feeRate: siteData.feeRate,
+    });
+
+    const confirmation = document.querySelector("[data-order-confirmation]");
+    const result = document.querySelector("[data-order-result]");
+    if (confirmation && result) {
+      confirmation.hidden = false;
+      result.innerHTML = `
+        <p><strong>ID</strong>: ${order.id}</p>
+        <p><strong>Email</strong>: ${order.customer.email}</p>
+        <p><strong>${translate("total_label")}</strong>: ${formatCurrency(order.summary.total, state.currency)}</p>
+      `;
+    }
+
+    cart.clear();
+    persistCart();
+    form.reset();
+    renderCartPage();
+    renderCheckoutPage();
+  });
 }
 
 function init() {
@@ -201,9 +403,14 @@ function init() {
   renderCatalogs();
   renderPolicies();
   renderDetail();
+  renderCartPage();
+  renderCheckoutPage();
   bindSwitchers();
+  bindCatalogSearch();
+  bindTagFilters();
   bindConsent();
   bindChat();
+  bindCheckoutForm();
 }
 
 window.addEventListener("DOMContentLoaded", init);
