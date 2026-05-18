@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wingdy Detail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__brand"><a href="../index.html" class="site-logo">Wingdy</a><p class="site-tagline">Curated tickets for Nordic-grade escapes</p></div>
+    <nav class="site-nav"><ul class="site-nav__menu"><li><a href="../index.html">Home</a></li><li><a href="../pages/collection.html">Collections</a></li><li><a href="../pages/policy.html">Policy</a></li></ul></nav>
+    <div class="site-switchers">
+      <button type="button" data-locale-toggle="en">EN</button>
+      <button type="button" data-locale-toggle="zh">中文</button>
+      <button type="button" data-currency-toggle="USD">USD</button>
+      <button type="button" data-currency-toggle="EUR">EUR</button>
+      <button type="button" data-currency-toggle="GBP">GBP</button>
+    </div>
+  </header>
+  <main class="site-main">
+    <section class="detail-shell" data-detail-id="lagoon-lava-tunnel">
+      <div class="breadcrumbs"><a href="../index.html">Home</a><span>/</span><a href="../pages/collection.html">Collections</a><span>/</span><span>Detail</span></div>
+      <div class="detail-grid">
+        <div class="detail-gallery">
+          <img data-detail-image src="" alt="">
+        </div>
+        <div class="detail-panel">
+          <p class="eyebrow">Experience</p>
+          <h1 data-detail-title></h1>
+          <p class="muted" data-detail-excerpt></p>
+          <div class="detail-meta">
+            <strong class="price" data-detail-price></strong>
+            <span class="filter-chip" data-detail-region></span>
+          </div>
+          <div class="product-card__tags" data-detail-tags></div>
+          <div class="product-card__actions">
+            <a class="button button--primary" href="../pages/policy.html#checkout">Continue to payment</a>
+            <a class="button button--secondary" href="../pages/collection.html">Back to collection</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div><strong>Wingdy</strong><p>Ticketing for volcanoes, lagoons, and everything worth leaving the city for.</p></div>
+    <nav><ul class="site-footer__menu"><li><a href="../pages/policy.html">Privacy</a></li><li><a href="../pages/policy.html#refund">Refunds</a></li><li><a href="../pages/policy.html#terms">Terms</a></li></ul></nav>
+  </footer>
+  <div class="cookie-banner" data-cookie-banner hidden>
+    <p data-cookie-copy></p>
+    <div class="cookie-banner__actions">
+      <button type="button" data-cookie-accept></button>
+      <button type="button" data-cookie-dismiss></button>
+    </div>
+  </div>
+  <div class="chat-widget" data-chat-widget>
+    <button class="chat-widget__toggle" type="button" data-chat-toggle>AI</button>
+    <section class="chat-widget__panel" data-chat-panel hidden>
+      <header><h2 data-copy="support_title"></h2></header>
+      <div class="chat-widget__messages" data-chat-messages>
+        <p class="chat-widget__message chat-widget__message--bot">Ask about refunds, language, or payment.</p>
+      </div>
+      <form class="chat-widget__form" data-chat-form>
+        <input type="text" name="message" placeholder="FAQ" required>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+  </div>
+  <script type="module" src="../assets/js/site.js"></script>
+</body>
+</html>

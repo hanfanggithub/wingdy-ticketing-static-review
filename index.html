@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wingdy Static Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__brand">
+      <a href="./index.html" class="site-logo">Wingdy</a>
+      <p class="site-tagline">Curated tickets for Nordic-grade escapes</p>
+    </div>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <ul class="site-nav__menu">
+        <li><a href="./index.html#featured-tickets" data-copy="tickets">Tickets</a></li>
+        <li><a href="./index.html#bundle-deals" data-copy="packages">Packages</a></li>
+        <li><a href="./pages/collection.html" data-copy="collections">Collections</a></li>
+        <li><a href="./pages/policy.html" data-copy="policy">Policy</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__actions">
+      <div class="site-switchers">
+        <button type="button" data-locale-toggle="en">EN</button>
+        <button type="button" data-locale-toggle="zh">中文</button>
+        <button type="button" data-currency-toggle="USD">USD</button>
+        <button type="button" data-currency-toggle="EUR">EUR</button>
+        <button type="button" data-currency-toggle="GBP">GBP</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <section class="hero">
+      <div class="hero__content">
+        <p class="eyebrow" data-copy="hero_kicker">Wingdy Escapes</p>
+        <h1 data-copy="hero_title">Book extraordinary ticketed experiences with a calm, fast checkout.</h1>
+        <p data-copy="hero_body">Inspired by premium Nordic travel storefronts, built as a shareable static showcase for public review.</p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="./pages/collection.html" data-copy="book_now">Book now</a>
+          <a class="button button--ghost" href="./pages/policy.html" data-copy="hero_secondary">View policies</a>
+        </div>
+      </div>
+      <div class="hero__search">
+        <div class="search-panel">
+          <label for="wingdy-search" data-copy="search_label">Search experiences</label>
+          <input id="wingdy-search" type="search" placeholder="Blue Lagoon, Golden Circle, glacier caves">
+          <div class="search-panel__categories">
+            <a class="filter-chip" href="./pages/collection.html" data-copy="tickets">Tickets</a>
+            <a class="filter-chip" href="./pages/collection.html" data-copy="packages">Packages</a>
+            <a class="filter-chip" href="./pages/collection.html">Family</a>
+            <a class="filter-chip" href="./pages/collection.html">Luxury</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="product-section" id="featured-tickets">
+      <div class="section-heading">
+        <p class="eyebrow" data-copy="featured_label">Tickets</p>
+        <h2 data-copy="featured_tickets">Featured tickets</h2>
+      </div>
+      <div class="product-grid" data-featured-grid></div>
+    </section>
+
+    <section class="product-section" id="bundle-deals">
+      <div class="section-heading">
+        <p class="eyebrow" data-copy="package_label">Packages</p>
+        <h2 data-copy="bundle_deals">Bundle deals</h2>
+      </div>
+      <div class="product-grid" data-package-grid></div>
+    </section>
+
+    <section class="checkout-preview">
+      <div>
+        <p class="eyebrow" data-copy="checkout">Checkout</p>
+        <h2 data-copy="checkout_preview_title">Static payment preview</h2>
+      </div>
+      <form class="checkout-preview__form">
+        <input type="email" placeholder="Email">
+        <input type="tel" placeholder="Phone">
+        <input type="text" placeholder="Nationality">
+        <a class="button button--primary" href="./pages/policy.html#checkout" data-copy="checkout_preview_continue">Continue to payment</a>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Wingdy</strong>
+      <p>Ticketing for volcanoes, lagoons, and everything worth leaving the city for.</p>
+    </div>
+    <nav aria-label="Footer navigation">
+      <ul class="site-footer__menu">
+        <li><a href="./pages/policy.html" data-copy="policy">Privacy</a></li>
+        <li><a href="./pages/policy.html#refund">Refunds</a></li>
+        <li><a href="./pages/policy.html#terms">Terms</a></li>
+      </ul>
+    </nav>
+  </footer>
+
+  <div class="cookie-banner" data-cookie-banner hidden>
+    <p data-cookie-copy></p>
+    <div class="cookie-banner__actions">
+      <button type="button" data-cookie-accept></button>
+      <button type="button" data-cookie-dismiss></button>
+    </div>
+  </div>
+
+  <div class="chat-widget" data-chat-widget>
+    <button class="chat-widget__toggle" type="button" data-chat-toggle>AI</button>
+    <section class="chat-widget__panel" data-chat-panel hidden>
+      <header><h2 data-copy="support_title"></h2></header>
+      <div class="chat-widget__messages" data-chat-messages>
+        <p class="chat-widget__message chat-widget__message--bot">Ask about refunds, language, or payment.</p>
+      </div>
+      <form class="chat-widget__form" data-chat-form>
+        <input type="text" name="message" placeholder="FAQ" required>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="./assets/js/site.js"></script>
+</body>
+</html>

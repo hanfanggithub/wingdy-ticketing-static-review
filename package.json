@@ -1,0 +1,8 @@
+{
+  "name": "wingdy-static-preview",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "preview": "npx http-server . -p 4173 -c-1"
+  }
+}
